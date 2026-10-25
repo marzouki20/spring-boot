@@ -15,10 +15,9 @@ Pour le moment, le seul endpoint REST implémenté est la création d'un véhicu
 POST http://localhost:8086/api/vehicules/add
 ```
 
-Les opérations CRUD des véhicules, employés, agences, clients et contrats sont
-maintenant disponibles. Les entités réservation, paiement, maintenance et
-équipement sont encore modélisées en JPA, mais leurs contrôleurs REST et leurs
-services ne sont pas encore disponibles.
+Les opérations CRUD de toutes les entités principales sont maintenant
+disponibles : véhicules, employés, agences, clients, contrats, réservations,
+paiements, maintenances et équipements.
 
 ## Prérequis
 
@@ -329,6 +328,106 @@ l'URL, modifie son rôle et son agence, puis sauvegarde l'entité. L'identifiant
 création.
 
 La suppression renvoie `204 No Content` si elle réussit. Si l'identifiant
+
+## API des réservations, paiements, maintenances et équipements
+
+Ces ressources utilisent également le même CRUD complet :
+
+```text
+Réservations  : /api/reservations
+Paiements     : /api/paiements
+Maintenances  : /api/maintenances
+Équipements   : /api/equipements
+```
+
+Pour chacune :
+
+```http
+POST   /api/{ressource}/add
+GET    /api/{ressource}
+GET    /api/{ressource}/{id}
+PUT    /api/{ressource}/{id}
+DELETE /api/{ressource}/{id}
+```
+
+Exemple de réservation :
+
+```json
+{
+  "dateDebut": "2026-11-01",
+  "dateFin": "2026-11-05",
+  "statut": "EN_ATTENTE",
+  "vehicule": {
+    "idVehicule": 1
+  },
+  "client": {
+    "idClient": 1
+  }
+}
+```
+
+Endpoint :
+
+```http
+POST http://localhost:8086/api/reservations/add
+```
+
+Exemple de paiement :
+
+```json
+{
+  "montant": 850.00,
+  "datePaiement": "2026-11-01",
+  "modePaiement": "CARTE",
+  "contrat": {
+    "idContrat": 1
+  }
+}
+```
+
+Endpoint :
+
+```http
+POST http://localhost:8086/api/paiements/add
+```
+
+Exemple de maintenance :
+
+```json
+{
+  "dateDebut": "2026-11-10",
+  "dateFin": "2026-11-12",
+  "description": "Vidange et contrôle général",
+  "vehicule": {
+    "idVehicule": 1
+  }
+}
+```
+
+Endpoint :
+
+```http
+POST http://localhost:8086/api/maintenances/add
+```
+
+Exemple d'équipement :
+
+```json
+{
+  "libelle": "GPS"
+}
+```
+
+Endpoint :
+
+```http
+POST http://localhost:8086/api/equipements/add
+```
+
+Les relations obligatoires doivent référencer des identifiants existants.
+Lors d'une modification, chaque service charge d'abord l'entité existante,
+met à jour ses champs, puis la sauvegarde. Une suppression peut être refusée
+par MySQL si l'entité est encore référencée par une autre table. Si l'identifiant
 n'existe pas, le service lève une erreur `Employee not found: {id}`.
 
 ## API des agences, clients et contrats
