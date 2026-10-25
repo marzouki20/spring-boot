@@ -15,9 +15,10 @@ Pour le moment, le seul endpoint REST implémenté est la création d'un véhicu
 POST http://localhost:8086/api/vehicules/add
 ```
 
-Les opérations CRUD des véhicules et des employés sont maintenant disponibles.
-Les autres classes métier sont des entités JPA, mais leurs contrôleurs REST et
-leurs implémentations complètes de services ne sont pas encore disponibles.
+Les opérations CRUD des véhicules, employés, agences, clients et contrats sont
+maintenant disponibles. Les entités réservation, paiement, maintenance et
+équipement sont encore modélisées en JPA, mais leurs contrôleurs REST et leurs
+services ne sont pas encore disponibles.
 
 ## Prérequis
 
@@ -329,6 +330,90 @@ création.
 
 La suppression renvoie `204 No Content` si elle réussit. Si l'identifiant
 n'existe pas, le service lève une erreur `Employee not found: {id}`.
+
+## API des agences, clients et contrats
+
+Les trois ressources suivantes utilisent le même fonctionnement CRUD que les
+véhicules et les employés :
+
+```text
+Agences  : /api/agences
+Clients  : /api/clients
+Contrats : /api/contrats
+```
+
+Pour chaque ressource, les endpoints disponibles sont :
+
+```http
+POST   /api/{ressource}/add
+GET    /api/{ressource}
+GET    /api/{ressource}/{id}
+PUT    /api/{ressource}/{id}
+DELETE /api/{ressource}/{id}
+```
+
+### Exemple d'agence
+
+```json
+{
+  "nom": "Agence Centre",
+  "ville": "Tunis",
+  "adresse": "10 avenue Habib Bourguiba",
+  "telephone": "71123456"
+}
+```
+
+Endpoint :
+
+```http
+POST http://localhost:8086/api/agences/add
+```
+
+### Exemple de client
+
+```json
+{
+  "nom": "Ben Ali",
+  "prenom": "Ahmed",
+  "email": "ahmed.benali@example.com",
+  "telephone": "22123456",
+  "numPermis": "PERMIS-12345",
+  "dateInscription": "2026-10-25"
+}
+```
+
+Endpoint :
+
+```http
+POST http://localhost:8086/api/clients/add
+```
+
+L'email et le numéro de permis doivent être uniques.
+
+### Exemple de contrat
+
+```json
+{
+  "dateSignature": "2026-10-25",
+  "montantTotal": 850.00,
+  "valide": true,
+  "reservation": {
+    "idReservation": 1
+  }
+}
+```
+
+Endpoint :
+
+```http
+POST http://localhost:8086/api/contrats/add
+```
+
+Une réservation ne peut être liée qu'à un seul contrat, car la relation
+contrat-réservation possède une clé étrangère unique. Pour une modification,
+le service charge d'abord l'entité existante avec l'identifiant de l'URL, puis
+met à jour ses champs avant d'appeler le repository. La suppression renvoie
+`204 No Content` si elle réussit.
 
 ### Afficher tous les véhicules
 
