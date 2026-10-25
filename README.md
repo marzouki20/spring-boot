@@ -15,6 +15,7 @@ Pour le moment, le seul endpoint REST implémenté est la création d'un véhicu
 POST http://localhost:8086/api/vehicules/add
 ```
 
+Les opérations CRUD des véhicules et des employés sont maintenant disponibles.
 Les autres classes métier sont des entités JPA, mais leurs contrôleurs REST et
 leurs implémentations complètes de services ne sont pas encore disponibles.
 
@@ -278,6 +279,56 @@ DISPONIBLE, LOUE, MAINTENANCE
 
 Les valeurs sont sensibles à la casse et doivent respecter exactement ces
 noms.
+
+## API des employés
+
+Les employés sont gérés sous le chemin `/api/employes`. Un employé possède un
+identifiant, un rôle (`AGENT` ou `MANAGER`) et peut être affecté à une agence.
+
+### Endpoints employés
+
+```http
+POST   /api/employes/add
+GET    /api/employes
+GET    /api/employes/{id}
+PUT    /api/employes/{id}
+DELETE /api/employes/{id}
+```
+
+Créer un employé :
+
+```json
+{
+  "role": "AGENT",
+  "agence": {
+    "idagence": 1
+  }
+}
+```
+
+Modifier un employé :
+
+```http
+PUT http://localhost:8086/api/employes/1
+Content-Type: application/json
+```
+
+```json
+{
+  "role": "MANAGER",
+  "agence": {
+    "idagence": 1
+  }
+}
+```
+
+Le service charge d'abord l'employé existant avec l'identifiant présent dans
+l'URL, modifie son rôle et son agence, puis sauvegarde l'entité. L'identifiant
+`idEmploye` est généré automatiquement et ne doit pas être fourni lors d'une
+création.
+
+La suppression renvoie `204 No Content` si elle réussit. Si l'identifiant
+n'existe pas, le service lève une erreur `Employee not found: {id}`.
 
 ### Afficher tous les véhicules
 
